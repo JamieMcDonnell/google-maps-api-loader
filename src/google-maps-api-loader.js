@@ -3,9 +3,9 @@
 var Promise = require('es6-promise').Promise;
 var urlBuilder = require('../lib/url-builder.js');
 
-var googleApi;
+var googleApi, loadingGoogleApi;
 
-function loadAutoCompleteAPI(params) {
+function loadAutoCompleteAPI (params) {
   var script = document.createElement('script');
 
   script.type = 'text/javascript';
@@ -31,26 +31,31 @@ function loadAutoCompleteAPI(params) {
  *
  * @return {promise}
  */
-function googleMapsApiLoader(params) {
+function googleMapsApiLoader (params) {
   if (googleApi) {
     return Promise.resolve(googleApi);
   }
 
-  return new Promise(function(resolve, reject) {
+  if (loadingGoogleApi) {
+    return loadingGoogleApi
+  }
+
+  loadingGoogleApi = new Promise(function (resolve, reject) {
     loadAutoCompleteAPI(params);
 
-    window.googleMapsAutoCompleteAPILoad = function() {
+    window.googleMapsAutoCompleteAPILoad = function () {
       googleApi = window.google;
       resolve(googleApi);
     };
 
-    setTimeout(function() {
+    setTimeout(function () {
       if (!window.google) {
         reject(new Error('Loading took too long'));
       }
     }, 5000);
   });
+
+  return loadingGoogleApi
 }
 
 module.exports = googleMapsApiLoader;
-
