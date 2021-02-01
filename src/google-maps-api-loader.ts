@@ -32,7 +32,6 @@ function loadAutoCompleteAPI (params) {
  * @return {promise}
  */
 function googleMapsApiLoader (params) {
-  debugger
   if (googleApi) {
     return Promise.resolve(googleApi);
   }
